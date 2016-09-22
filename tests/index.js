@@ -80,7 +80,7 @@ describe('TransitionGroup', () => {
 		sinon.spy(Todo.prototype, 'componentDidEnter');
 
 		list.handleAdd('foo');
-		rerender();
+		// rerender();
 
 		setTimeout( () => {
 			expect($('.item')).to.have.length(5);
@@ -100,7 +100,7 @@ describe('TransitionGroup', () => {
 		sinon.spy(Todo.prototype, 'componentDidLeave');
 
 		list.handleRemove(0);
-		rerender();
+		// rerender();
 
 		// make sure -leave class was added
 		setTimeout( () => {

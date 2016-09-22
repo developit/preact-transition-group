@@ -1,6 +1,6 @@
 import { h, Component, cloneElement } from 'preact';
-import { mergeChildMappings, isShownInChildren, isShownInChildrenByKey, inChildren, inChildrenByKey } from './TransitionChildMapping';
-import { assign } from './util';
+import { getChildMapping, mergeChildMappings } from './TransitionChildMapping';
+import { assign, linkRef } from './util';
 
 
 const identity = i => i;
@@ -14,7 +14,7 @@ export class TransitionGroup extends Component {
 	refs = {};
 
 	state = {
-		children: (this.props.children || []).slice()
+		children: getChildMapping(this.props.children || [])
 	};
 
 	componentWillMount() {
@@ -34,7 +34,7 @@ export class TransitionGroup extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		let nextChildMapping = (nextProps.children || []).slice();
+		let nextChildMapping = getChildMapping(nextProps.children || []);
 		let prevChildMapping = this.state.children;
 
 		this.setState({
@@ -89,7 +89,7 @@ export class TransitionGroup extends Component {
 
 		delete this.currentlyTransitioningKeys[key];
 
-		let currentChildMapping = (this.props.children || []).slice();
+		let currentChildMapping = getChildMapping(this.props.children || []);
 
 		if (!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
 			// This was removed before it had fully appeared. Remove it.
@@ -118,7 +118,7 @@ export class TransitionGroup extends Component {
 
 		delete this.currentlyTransitioningKeys[key];
 
-		let currentChildMapping = (this.props.children || []).slice();
+		let currentChildMapping = getChildMapping(this.props.children || []);
 
 		if (!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
 			// This was removed before it had fully entered. Remove it.
@@ -150,15 +150,15 @@ export class TransitionGroup extends Component {
 
 		delete this.currentlyTransitioningKeys[key];
 
-		let currentChildMapping = (this.props.children || []).slice();
+		let currentChildMapping = getChildMapping(this.props.children || []);
 
 		if (currentChildMapping && currentChildMapping.hasOwnProperty(key)) {
 			// This entered again before it fully left. Add it again.
 			this.performEnter(key);
 		}
 		else {
-			let children = this.state.children.slice();
-			children.splice(key, 1);
+			let children = assign({}, this.state.children);
+			delete children[key];
 			this.setState({ children });
 		}
 	}
@@ -170,13 +170,9 @@ export class TransitionGroup extends Component {
 		for (let key in children) if (children.hasOwnProperty(key)) {
 			let child = children[key];
 			if (child) {
-				// key = child.attributes && child.attributes.key || key;
-
-				childrenToRender.push(
-					cloneElement(childFactory(child), { ref: c => {
-						if (!(this.refs[key] = c)) child = null;
-					}, key })
-				);
+				let ref = linkRef(this, key),
+					el = cloneElement(childFactory(child), { ref, key });
+				childrenToRender.push(el);
 			}
 		}
 

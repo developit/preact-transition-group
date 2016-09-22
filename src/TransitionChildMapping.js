@@ -13,62 +13,54 @@
 import { getKey } from './util';
 
 
-// look for a needle in a haystack
-function find(arr, iter) {
-	for (let i=arr.length; i--; ) {
-		if (iter(arr[i])) return true;
+export function getChildMapping(children) {
+	let out = {};
+	for (let i=0; i<children.length; i++) {
+		let key = getKey(children[i], i.toString(36));
+		out[key] = children[i];
 	}
-	return false;
-}
-
-
-export function inChildrenByKey(children, key) {
-	return find(children, c => getKey(c)===key);
-}
-
-export function inChildren(children, child) {
-	return inChildrenByKey(children, getKey(child));
-}
-
-
-export function isShownInChildrenByKey(children, key, showProp) {
-	return find(children, c => (
-		getKey(c)===key && c.props[showProp]
-	));
-}
-
-export function isShownInChildren(children, child, showProp) {
-	return isShownInChildrenByKey(children, getKey(child), showProp);
+	return out;
 }
 
 
 export function mergeChildMappings(prev, next) {
-	let ret = [];
+	prev = prev || {};
+	next = next || {};
+
+	let getValueForKey = key => next.hasOwnProperty(key) ? next[key] : prev[key];
 
 	// For each key of `next`, the list of keys to insert before that key in
 	// the combined list
-	let nextChildrenPending = {},
-		pendingChildren = [];
-	prev.forEach( c => {
-		let key = getKey(c);
-		if (inChildrenByKey(next, key)) {
-			if (pendingChildren.length) {
-				nextChildrenPending[key] = pendingChildren;
-				pendingChildren = [];
+	let nextKeysPending = {};
+
+	let pendingKeys = [];
+	for (let prevKey in prev) {
+		if (next.hasOwnProperty(prevKey)) {
+			if (pendingKeys.length) {
+				nextKeysPending[prevKey] = pendingKeys;
+				pendingKeys = [];
 			}
 		}
 		else {
-			pendingChildren.push(c);
+			pendingKeys.push(prevKey);
 		}
-	});
+	}
 
-	next.forEach( c => {
-		let key = getKey(c);
-		if (nextChildrenPending.hasOwnProperty(key)) {
-			ret = ret.concat(nextChildrenPending[key]);
+	let childMapping = {};
+	for (let nextKey in next) {
+		if (nextKeysPending.hasOwnProperty(nextKey)) {
+			for (let i=0; i<nextKeysPending[nextKey].length; i++) {
+				let pendingNextKey = nextKeysPending[nextKey][i];
+				childMapping[nextKeysPending[nextKey][i]] = getValueForKey(pendingNextKey);
+			}
 		}
-		ret.push(c);
-	});
+		childMapping[nextKey] = getValueForKey(nextKey);
+	}
 
-	return ret.concat(pendingChildren);
+	// Finally, add the keys which didn't appear before any key in `next`
+	for (let i=0; i<pendingKeys.length; i++) {
+		childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
+	}
+
+	return childMapping;
 }
