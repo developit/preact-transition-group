@@ -16,8 +16,10 @@ import { getKey } from './util';
 export function getChildMapping(children) {
 	let out = {};
 	for (let i=0; i<children.length; i++) {
-		let key = getKey(children[i], i.toString(36));
-		out[key] = children[i];
+		if (children[i]!=null) {
+			let key = getKey(children[i], i.toString(36));
+			out[key] = children[i];
+		}
 	}
 	return out;
 }
