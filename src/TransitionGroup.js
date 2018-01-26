@@ -19,6 +19,7 @@ export class TransitionGroup extends Component {
 
 	componentWillMount() {
 		this.currentlyTransitioningKeys = {};
+		this.keysToAbortLeave = [];
 		this.keysToEnter = [];
 		this.keysToLeave = [];
 	}
@@ -45,7 +46,11 @@ export class TransitionGroup extends Component {
 
 		for (key in nextChildMapping) if (nextChildMapping.hasOwnProperty(key)) {
 			let hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
-			if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
+			// We should re-enter the component and abort its leave function
+			if (nextChildMapping[key] && hasPrev && this.currentlyTransitioningKeys[key]) {
+				this.keysToEnter.push(key);
+				this.keysToAbortLeave.push(key);
+			} else if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
 				this.keysToEnter.push(key);
 			}
 		}
@@ -127,6 +132,14 @@ export class TransitionGroup extends Component {
 	}
 
 	performLeave = (key) => {
+		// If we should immediately abort this leave function,
+		// don't run the leave transition at all.
+		const idx = this.keysToAbortLeave.indexOf(key);
+		if (idx !== -1) {
+			this.keysToAbortLeave.splice(idx, 1);
+			return;
+		}
+
 		this.currentlyTransitioningKeys[key] = true;
 
 		let component = this.refs[key];
@@ -142,6 +155,15 @@ export class TransitionGroup extends Component {
 	};
 
 	_handleDoneLeaving(key) {
+		// If we should immediately abort the leave,
+		// then skip this altogether
+		const idx = this.keysToAbortLeave.indexOf(key);
+		if (idx !== -1) {
+			this.keysToAbortLeave.splice(idx, 1);
+			delete this.currentlyTransitioningKeys[key];
+			return;
+		}
+
 		let component = this.refs[key];
 
 		if (component.componentDidLeave) {
