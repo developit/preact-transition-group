@@ -73,6 +73,13 @@ export class TransitionGroup extends Component {
 		keysToLeave.forEach(this.performLeave);
 	}
 
+	_finishAbort (key) {
+		const idx = this.keysToAbortLeave.indexOf(key);
+		if (idx !== -1) {
+			this.keysToAbortLeave.splice(idx, 1);
+		}
+	}
+
 	performAppear(key) {
 		this.currentlyTransitioningKeys[key] = true;
 
@@ -93,6 +100,7 @@ export class TransitionGroup extends Component {
 		}
 
 		delete this.currentlyTransitioningKeys[key];
+		this._finishAbort(key);
 
 		let currentChildMapping = getChildMapping(this.props.children || []);
 
@@ -122,6 +130,7 @@ export class TransitionGroup extends Component {
 		}
 
 		delete this.currentlyTransitioningKeys[key];
+		this._finishAbort(key);
 
 		let currentChildMapping = getChildMapping(this.props.children || []);
 
@@ -136,7 +145,6 @@ export class TransitionGroup extends Component {
 		// don't run the leave transition at all.
 		const idx = this.keysToAbortLeave.indexOf(key);
 		if (idx !== -1) {
-			this.keysToAbortLeave.splice(idx, 1);
 			return;
 		}
 
@@ -159,8 +167,6 @@ export class TransitionGroup extends Component {
 		// then skip this altogether
 		const idx = this.keysToAbortLeave.indexOf(key);
 		if (idx !== -1) {
-			this.keysToAbortLeave.splice(idx, 1);
-			delete this.currentlyTransitioningKeys[key];
 			return;
 		}
 
