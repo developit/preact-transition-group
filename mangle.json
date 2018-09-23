@@ -1,0 +1,14 @@
+{
+  "vars": {
+    "props": {}
+  },
+  "props": {
+    "props": {
+      "$_ptgLinkedRefs": "i",
+      "$_finishAbort": "t",
+      "$_handleDoneAppearing": "n",
+      "$_handleDoneEntering": "r",
+      "$_handleDoneLeaving": "s"
+    }
+  }
+}

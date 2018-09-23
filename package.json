@@ -3,20 +3,25 @@
   "amdName": "PreactTransitionGroup",
   "version": "1.1.1",
   "description": "transition-group ui component for preact",
+  "source": "src/index.js",
+  "module": "dist/preact-transition-group.mjs",
   "main": "dist/preact-transition-group.js",
-  "minified:main": "dist/preact-transition-group.min.js",
-  "jsnext:main": "src/index.js",
+  "umd:main": "dist/preact-transition-group.umd.js",
   "scripts": {
-    "build": "npm-run-all transpile minify size",
-    "transpile": "rollup -c rollup.config.js",
-    "minify": "uglifyjs $npm_package_main -cm -o $npm_package_minified_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_minified_main}.map",
-    "size": "echo \"gzip size: $(gzip-size $npm_package_minified_main | pretty-bytes)\"",
+    "build": "microbundle",
     "test": "npm-run-all lint build test:karma",
     "lint": "eslint {src,test}",
     "test:karma": "karma start tests/karma.conf.js --single-run",
     "prepublish": "npm-run-all build test",
     "release": "npm run -s build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
+  "mangle": {
+    "regex": "^_"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
   "keywords": [
     "preact",
     "preact-component",
@@ -48,7 +53,6 @@
     "chai": "^3.5.0",
     "css-loader": "^0.23.1",
     "eslint": "~2.2.0",
-    "gzip-size-cli": "^1.0.0",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-chai-sinon": "^0.1.5",
@@ -57,20 +61,15 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "microbundle": "^0.6.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "npm-run-all": "^1.5.2",
     "phantomjs-prebuilt": "^2.1.5",
     "preact": "^8.2.7",
-    "pretty-bytes-cli": "^1.0.0",
-    "rollup": "^0.36.0",
-    "rollup-plugin-babel": "^2.6.1",
-    "rollup-plugin-commonjs": "^5.0.4",
-    "rollup-plugin-node-resolve": "^2.0.0",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.0",
-    "uglify-js": "^2.6.2",
     "webpack": "^1.12.14"
   },
   "peerDependencies": {

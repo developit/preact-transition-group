@@ -6,16 +6,19 @@ import { assign, linkRef } from './util';
 const identity = i => i;
 
 export class TransitionGroup extends Component {
-	static defaultProps = {
-		component: 'span',
-		childFactory: identity
-	};
 
-	refs = {};
+	constructor(props, context) {
+		super(props, context);
 
-	state = {
-		children: getChildMapping(this.props.children || [])
-	};
+		this.refs = {};
+
+		this.state = {
+			children: getChildMapping(this.props.children || [])
+		};
+
+		this.performLeave = this.performLeave.bind(this);
+		this.performEnter = this.performEnter.bind(this);
+	}
 
 	componentWillMount() {
 		this.currentlyTransitioningKeys = {};
@@ -75,7 +78,7 @@ export class TransitionGroup extends Component {
 		});
 	}
 
-	_finishAbort (key) {
+	_finishAbort(key) {
 		const idx = this.keysToAbortLeave.indexOf(key);
 		if (idx !== -1) {
 			this.keysToAbortLeave.splice(idx, 1);
@@ -112,7 +115,7 @@ export class TransitionGroup extends Component {
 		}
 	}
 
-	performEnter = (key) => {
+	performEnter(key) {
 		this.currentlyTransitioningKeys[key] = true;
 
 		let component = this.refs[key];
@@ -123,7 +126,7 @@ export class TransitionGroup extends Component {
 		else {
 			this._handleDoneEntering(key);
 		}
-	};
+	}
 
 	_handleDoneEntering(key) {
 		let component = this.refs[key];
@@ -142,7 +145,7 @@ export class TransitionGroup extends Component {
 		}
 	}
 
-	performLeave = (key) => {
+	performLeave(key) {
 		// If we should immediately abort this leave function,
 		// don't run the leave transition at all.
 		const idx = this.keysToAbortLeave.indexOf(key);
@@ -162,7 +165,7 @@ export class TransitionGroup extends Component {
 			// is done.
 			this._handleDoneLeaving(key);
 		}
-	};
+	}
 
 	_handleDoneLeaving(key) {
 		// If we should immediately abort the leave,
@@ -209,3 +212,8 @@ export class TransitionGroup extends Component {
 		return h(component, props, childrenToRender);
 	}
 }
+
+TransitionGroup.defaultProps = {
+	component: 'span',
+	childFactory: identity
+};
