@@ -1,4 +1,4 @@
-import { h, Component, render, rerender } from 'preact';
+import { h, Component, render } from 'preact';
 import TransitionGroup from 'src';
 
 /* global describe,expect,it,sinon */

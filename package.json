@@ -10,13 +10,31 @@
   "scripts": {
     "build": "microbundle",
     "test": "npm-run-all lint build test:karma",
-    "lint": "eslint {src,test}",
+    "lint": "eslint src tests",
     "test:karma": "karma start tests/karma.conf.js --single-run",
     "prepublish": "npm-run-all build test",
     "release": "npm run -s build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "mangle": {
     "regex": "^_"
+  },
+  "eslintConfig": {
+    "extends": "developit",
+    "settings": {
+      "react": {
+        "pragma": "h"
+      }
+    },
+    "rules": {
+      "prefer-rest-params": 0,
+      "prefer-spread": 0,
+      "no-cond-assign": 0,
+      "react/jsx-no-bind": 0,
+      "react/prefer-stateless-function": 0,
+      "react/sort-comp": 0,
+      "jest/valid-expect": 0,
+      "jest/no-disabled-tests": 0
+    }
   },
   "files": [
     "src",
@@ -52,7 +70,8 @@
     "babel-preset-stage-0": "^6.5.0",
     "chai": "^3.5.0",
     "css-loader": "^0.23.1",
-    "eslint": "~2.2.0",
+    "eslint": "^5.6.0",
+    "eslint-config-developit": "^1.1.1",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-chai-sinon": "^0.1.5",

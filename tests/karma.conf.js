@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = function(config) {
 	config.set({
@@ -37,7 +37,7 @@ module.exports = function(config) {
 							plugins: [
 								'transform-class-properties',
 								'transform-object-rest-spread',
-								['transform-react-jsx', { pragma:'h' }]
+								['transform-react-jsx', { pragma: 'h' }]
 							]
 						}
 					},

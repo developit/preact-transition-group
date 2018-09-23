@@ -53,7 +53,8 @@ export class TransitionGroup extends Component {
 			if (nextChildMapping[key] && hasPrev && this.currentlyTransitioningKeys[key]) {
 				this.keysToEnter.push(key);
 				this.keysToAbortLeave.push(key);
-			} else if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
+			}
+			else if (nextChildMapping[key] && !hasPrev && !this.currentlyTransitioningKeys[key]) {
 				this.keysToEnter.push(key);
 			}
 		}
