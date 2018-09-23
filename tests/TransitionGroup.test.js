@@ -1,7 +1,7 @@
 import { h, Component, render } from 'preact';
-import TransitionGroup from 'src';
+import TransitionGroup from '../src';
 
-/* global describe,expect,it,sinon */
+/* global describe,expect,it,spyOn */
 
 class Todo extends Component {
 	componentWillEnter(done) {
@@ -60,6 +60,7 @@ describe('TransitionGroup', () => {
 		list, root;
 	document.body.appendChild(container);
 
+	/** @type {(selector: string) => Element[]} */
 	let $ = s => [].slice.call(container.querySelectorAll(s));
 
 	beforeEach( () => {
@@ -72,47 +73,43 @@ describe('TransitionGroup', () => {
 	});
 
 	it('create works', () => {
-		expect($('.item')).to.have.length(4);
+		expect($('.item').length).toEqual(4);
 	});
 
 	it('enter works', done => {
-		sinon.spy(Todo.prototype, 'componentWillEnter');
-		sinon.spy(Todo.prototype, 'componentDidEnter');
+		spyOn(Todo.prototype, 'componentWillEnter').and.callThrough();
+		spyOn(Todo.prototype, 'componentDidEnter').and.callThrough();
 
 		list.handleAdd('foo');
 		// rerender();
 
 		setTimeout( () => {
-			expect($('.item')).to.have.length(5);
+			expect($('.item').length).toEqual(5);
 		});
 
 		setTimeout( () => {
-			expect($('.item')).to.have.length(5);
-			expect(Todo.prototype.componentDidEnter).to.have.been.calledOnce;
-			Todo.prototype.componentWillEnter.restore();
-			Todo.prototype.componentDidEnter.restore();
+			expect($('.item').length).toEqual(5);
+			expect(Todo.prototype.componentDidEnter).toHaveBeenCalledTimes(1);
 			done();
 		}, 40);
 	});
 
 	it('leave works', done => {
-		sinon.spy(Todo.prototype, 'componentWillLeave');
-		sinon.spy(Todo.prototype, 'componentDidLeave');
+		spyOn(Todo.prototype, 'componentWillLeave').and.callThrough();
+		spyOn(Todo.prototype, 'componentDidLeave').and.callThrough();
 
 		list.handleRemove(0);
 		// rerender();
 
 		// make sure -leave class was added
 		setTimeout( () => {
-			expect($('.item')).to.have.length(4);
+			expect($('.item').length).toEqual(4);
 		});
 
 		// then make sure it's gone
 		setTimeout( () => {
-			expect($('.item')).to.have.length(3);
-			expect(Todo.prototype.componentDidLeave).to.have.been.calledOnce;
-			Todo.prototype.componentWillLeave.restore();
-			Todo.prototype.componentDidLeave.restore();
+			expect($('.item').length).toEqual(3);
+			expect(Todo.prototype.componentDidLeave).toHaveBeenCalledTimes(1);
 			done();
 		}, 40);
 	});
