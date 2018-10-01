@@ -9,11 +9,11 @@
   "umd:main": "dist/preact-transition-group.umd.js",
   "scripts": {
     "build": "microbundle",
-    "test": "npm-run-all lint build test:karma",
+    "test": "run-s lint build test:karma",
     "lint": "eslint src tests",
     "test:karma": "karmatic",
     "test:karma:watch": "karmatic watch --no-headless",
-    "prepublish": "npm-run-all build test",
+    "prepublish": "run-s test",
     "release": "npm run -s build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "mangle": {
