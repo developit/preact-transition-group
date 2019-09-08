@@ -1,4 +1,4 @@
-import { h, Component, cloneElement } from 'preact';
+import { h, Component, cloneElement, toChildArray } from 'preact';
 import { getChildMapping, mergeChildMappings } from './TransitionChildMapping';
 import { assign, linkRef } from './util';
 
@@ -14,7 +14,7 @@ export class TransitionGroup extends Component {
 	refs = {};
 
 	state = {
-		children: getChildMapping(this.props.children || [])
+		children: getChildMapping(toChildArray(toChildArray(this.props.children)) || [])
 	};
 
 	componentWillMount() {
@@ -35,12 +35,12 @@ export class TransitionGroup extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		let nextChildMapping = getChildMapping(nextProps.children || []);
+		let nextChildMapping = getChildMapping(toChildArray(nextProps.children) || []);
 		let prevChildMapping = this.state.children;
 
-		this.setState({
-			children: mergeChildMappings(prevChildMapping, nextChildMapping)
-		});
+		this.setState(prevState => ({
+			children: mergeChildMappings(prevState.children, nextChildMapping)
+		}));
 
 		let key;
 
@@ -104,7 +104,7 @@ export class TransitionGroup extends Component {
 		delete this.currentlyTransitioningKeys[key];
 		this._finishAbort(key);
 
-		let currentChildMapping = getChildMapping(this.props.children || []);
+		let currentChildMapping = getChildMapping(toChildArray(this.props.children) || []);
 
 		if (!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
 			// This was removed before it had fully appeared. Remove it.
@@ -134,7 +134,7 @@ export class TransitionGroup extends Component {
 		delete this.currentlyTransitioningKeys[key];
 		this._finishAbort(key);
 
-		let currentChildMapping = getChildMapping(this.props.children || []);
+		let currentChildMapping = getChildMapping(toChildArray(this.props.children) || []);
 
 		if (!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
 			// This was removed before it had fully entered. Remove it.
@@ -180,7 +180,7 @@ export class TransitionGroup extends Component {
 
 		delete this.currentlyTransitioningKeys[key];
 
-		let currentChildMapping = getChildMapping(this.props.children || []);
+		let currentChildMapping = getChildMapping(toChildArray(this.props.children) || []);
 
 		if (currentChildMapping && currentChildMapping.hasOwnProperty(key)) {
 			// This entered again before it fully left. Add it again.
