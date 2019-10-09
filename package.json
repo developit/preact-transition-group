@@ -1,5 +1,5 @@
 {
-  "name": "preact-transition-group-x",
+  "name": "preact-transition-group",
   "amdName": "PreactTransitionGroup",
   "version": "2.0.1",
   "description": "transition-group ui component for preact",
