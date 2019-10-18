@@ -1,7 +1,7 @@
 {
-  "name": "preact-transition-group",
+  "name": "preact-transition-group-x",
   "amdName": "PreactTransitionGroup",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "transition-group ui component for preact",
   "main": "dist/preact-transition-group.js",
   "minified:main": "dist/preact-transition-group.min.js",

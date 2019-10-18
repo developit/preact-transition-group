@@ -64,15 +64,13 @@ export class TransitionGroup extends Component {
 	}
 
 	componentDidUpdate() {
-		setTimeout(() => {
-			let keysToEnter = this.keysToEnter;
-			this.keysToEnter = [];
-			keysToEnter.forEach(this.performEnter);
+		let keysToEnter = this.keysToEnter;
+		this.keysToEnter = [];
+		keysToEnter.forEach(this.performEnter);
 
-			let keysToLeave = this.keysToLeave;
-			this.keysToLeave = [];
-			keysToLeave.forEach(this.performLeave);
-		});
+		let keysToLeave = this.keysToLeave;
+		this.keysToLeave = [];
+		keysToLeave.forEach(this.performLeave);
 	}
 
 	_finishAbort (key) {
