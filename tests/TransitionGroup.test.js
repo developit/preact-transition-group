@@ -3,6 +3,11 @@ import { act } from 'preact/test-utils';
 import TransitionGroup from '../src';
 import { setupCustomMatchers, setupScratch, teardown } from './utils';
 
+/**
+ * @typedef ArrayLikeMatchers
+ * @property {(expectedLength: number) => boolean} toHaveLength
+ */
+
 class Todo extends Component {
 	componentWillEnter(done) {
 		setTimeout(done, 20);
