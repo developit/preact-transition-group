@@ -1,7 +1,8 @@
 import { h, Component, render, rerender } from 'preact';
-import TransitionGroup from 'src';
+import TransitionGroup from '../src';
+import { setupCustomMatchers, setupScratch, teardown } from './utils';
 
-/* global describe,expect,it,sinon */
+/* global describe,expect,it,spyOn */
 
 class Todo extends Component {
 	componentWillEnter(done) {
@@ -52,69 +53,67 @@ class TodoList extends Component {
 }
 
 
-const Nothing = () => null;
-
-
 describe('TransitionGroup', () => {
-	let container = document.createElement('div'),
-		list, root;
-	document.body.appendChild(container);
 
-	let $ = s => [].slice.call(container.querySelectorAll(s));
+	/** @type {HTMLDivElement} */
+	let scratch;
 
-	beforeEach( () => {
-		root = render(<TodoList ref={c => list=c} />, container, root);
+	/** @type {TodoList} */
+	let list;
+
+	/** @type {(selector: string) => Element[]} */
+	let $ = s => [].slice.call(scratch.querySelectorAll(s));
+
+	beforeAll(() => {
+		setupCustomMatchers();
 	});
 
-	afterEach( () => {
+	beforeEach(() => {
+		jasmine.clock().install();
+		scratch = setupScratch();
+		render(<TodoList ref={c => list=c} />, scratch);
+	});
+
+	afterEach(() => {
 		list = null;
-		root = render(<Nothing />, container, root);
+		teardown(scratch);
+		jasmine.clock().uninstall();
 	});
 
 	it('create works', () => {
-		expect($('.item')).to.have.length(4);
+		expect($('.item')).toHaveLength(4);
 	});
 
-	it('enter works', done => {
-		sinon.spy(Todo.prototype, 'componentWillEnter');
-		sinon.spy(Todo.prototype, 'componentDidEnter');
+	it('enter works', () => {
+		spyOn(Todo.prototype, 'componentWillEnter').and.callThrough();
+		spyOn(Todo.prototype, 'componentDidEnter').and.callThrough();
 
 		list.handleAdd('foo');
-		// rerender();
+		rerender();
 
-		setTimeout( () => {
-			expect($('.item')).to.have.length(5);
-		});
+		expect($('.item')).toHaveLength(5);
 
-		setTimeout( () => {
-			expect($('.item')).to.have.length(5);
-			expect(Todo.prototype.componentDidEnter).to.have.been.calledOnce;
-			Todo.prototype.componentWillEnter.restore();
-			Todo.prototype.componentDidEnter.restore();
-			done();
-		}, 40);
+		jasmine.clock().tick(40);
+		rerender();
+
+		expect($('.item')).toHaveLength(5);
+		expect(Todo.prototype.componentDidEnter).toHaveBeenCalledTimes(1);
 	});
 
-	it('leave works', done => {
-		sinon.spy(Todo.prototype, 'componentWillLeave');
-		sinon.spy(Todo.prototype, 'componentDidLeave');
+	it('leave works', () => {
+		spyOn(Todo.prototype, 'componentWillLeave').and.callThrough();
+		spyOn(Todo.prototype, 'componentDidLeave').and.callThrough();
 
 		list.handleRemove(0);
-		// rerender();
+		rerender();
 
-		// make sure -leave class was added
-		setTimeout( () => {
-			expect($('.item')).to.have.length(4);
-		});
+		expect($('.item')).toHaveLength(4);
 
-		// then make sure it's gone
-		setTimeout( () => {
-			expect($('.item')).to.have.length(3);
-			expect(Todo.prototype.componentDidLeave).to.have.been.calledOnce;
-			Todo.prototype.componentWillLeave.restore();
-			Todo.prototype.componentDidLeave.restore();
-			done();
-		}, 40);
+		jasmine.clock().tick(40);
+		rerender();
+
+		expect($('.item')).toHaveLength(3);
+		expect(Todo.prototype.componentDidLeave).toHaveBeenCalledTimes(1);
 	});
 
 	// it('transitionLeave works', done => {
