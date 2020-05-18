@@ -6,16 +6,19 @@ import { assign, linkRef } from './util';
 const identity = i => i;
 
 export class TransitionGroup extends Component {
-	static defaultProps = {
-		component: 'span',
-		childFactory: identity
-	};
+	constructor(props, context) {
+		super(props, context);
 
-	refs = {};
+		this.refs = {};
 
-	state = {
-		children: getChildMapping(toChildArray(toChildArray(this.props.children)) || [])
-	};
+		this.state = {
+			children: getChildMapping(toChildArray(toChildArray(this.props.children)) || [])
+		};
+
+		this.performAppear = this.performAppear.bind(this);
+		this.performEnter = this.performEnter.bind(this);
+		this.performLeave = this.performLeave.bind(this);
+	}
 
 	componentWillMount() {
 		this.currentlyTransitioningKeys = {};
@@ -208,3 +211,8 @@ export class TransitionGroup extends Component {
 		return h(component, props, childrenToRender);
 	}
 }
+
+TransitionGroup.defaultProps = {
+	component: 'span',
+	childFactory: identity
+};

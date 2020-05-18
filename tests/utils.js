@@ -23,8 +23,8 @@ export function setupCustomMatchers() {
 				if (!actualArray || typeof actualArray.length !== 'number') {
 					throw new Error(
 						'[.not].toHaveLength expected actual value to have a ' +
-							'"length" property that is a number. Recieved: ' +
-							actualArray
+						'"length" property that is a number. Recieved: ' +
+						actualArray
 					);
 				}
 
@@ -33,9 +33,9 @@ export function setupCustomMatchers() {
 
 				const message = !pass
 					? // Error message for `.toHaveLength` case
-					  `Expected actual value to have length ${expectedLength} but got ${actualLength}`
+					`Expected actual value to have length ${expectedLength} but got ${actualLength}`
 					: // Error message for `.not.toHaveLength` case
-					  `Expected actual value to not have length ${expectedLength} but got ${actualLength}`;
+					`Expected actual value to not have length ${expectedLength} but got ${actualLength}`;
 
 				return { pass, message };
 			}

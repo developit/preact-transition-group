@@ -1,19 +1,18 @@
-import { h, Component, render, rerender } from 'preact';
+import { h, Component, render } from 'preact';
+import { act } from 'preact/test-utils';
 import TransitionGroup from '../src';
 import { setupCustomMatchers, setupScratch, teardown } from './utils';
-
-/* global describe,expect,it,spyOn */
 
 class Todo extends Component {
 	componentWillEnter(done) {
 		setTimeout(done, 20);
 	}
-	componentDidEnter() {}
+	componentDidEnter() { }
 
 	componentWillLeave(done) {
 		setTimeout(done, 20);
 	}
-	componentDidLeave() {}
+	componentDidLeave() { }
 
 	render({ onClick, children }) {
 		return <div onClick={onClick} class="item">{children}</div>;
@@ -21,9 +20,13 @@ class Todo extends Component {
 }
 
 class TodoList extends Component {
-	state = {
-		items: ['hello', 'world', 'click', 'me']
-	};
+	constructor() {
+		super();
+
+		this.state = {
+			items: ['hello', 'world', 'click', 'me']
+		};
+	}
 
 	handleAdd(item) {
 		let { items } = this.state;
@@ -41,11 +44,11 @@ class TodoList extends Component {
 		return (
 			<div>
 				<TransitionGroup>
-					{ items.map( (item, i) => (
+					{items.map((item, i) => (
 						<Todo key={item} onClick={this.handleRemove.bind(this, i)}>
 							{item}
 						</Todo>
-					)) }
+					))}
 				</TransitionGroup>
 			</div>
 		);
@@ -71,7 +74,7 @@ describe('TransitionGroup', () => {
 	beforeEach(() => {
 		jasmine.clock().install();
 		scratch = setupScratch();
-		render(<TodoList ref={c => list=c} />, scratch);
+		render(<TodoList ref={c => list = c} />, scratch);
 	});
 
 	afterEach(() => {
@@ -84,33 +87,35 @@ describe('TransitionGroup', () => {
 		expect($('.item')).toHaveLength(4);
 	});
 
-	it('enter works', () => {
+	it('enter works', async () => {
 		spyOn(Todo.prototype, 'componentWillEnter').and.callThrough();
 		spyOn(Todo.prototype, 'componentDidEnter').and.callThrough();
 
-		list.handleAdd('foo');
-		rerender();
+		await act(() => {
+			list.handleAdd('foo');
+		});
 
 		expect($('.item')).toHaveLength(5);
 
 		jasmine.clock().tick(40);
-		rerender();
+		await act(() => { });
 
 		expect($('.item')).toHaveLength(5);
 		expect(Todo.prototype.componentDidEnter).toHaveBeenCalledTimes(1);
 	});
 
-	it('leave works', () => {
+	it('leave works', async () => {
 		spyOn(Todo.prototype, 'componentWillLeave').and.callThrough();
 		spyOn(Todo.prototype, 'componentDidLeave').and.callThrough();
 
-		list.handleRemove(0);
-		rerender();
+		await act(() => {
+			list.handleRemove(0);
+		});
 
 		expect($('.item')).toHaveLength(4);
 
 		jasmine.clock().tick(40);
-		rerender();
+		await act(() => { });
 
 		expect($('.item')).toHaveLength(3);
 		expect(Todo.prototype.componentDidLeave).toHaveBeenCalledTimes(1);
